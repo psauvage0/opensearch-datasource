@@ -11,6 +11,8 @@ import {
 import { createEmptyDataFrame, describeMetric } from './utils';
 import { metricAggregationConfig } from './components/QueryEditor/MetricAggregationsEditor/utils';
 
+const HIGHLIGHT_TAGS_EXP = `${queryDef.highlightTags.pre}([^@]+)${queryDef.highlightTags.post}`;
+
 export class OpenSearchResponse {
   constructor(
     private targets: OpenSearchQuery[],
@@ -365,6 +367,7 @@ export class OpenSearchResponse {
         _id: hit._id,
         _type: hit._type,
         _index: hit._index,
+        highlight: hit.highlight,
       };
 
       if (hit._source) {
@@ -475,6 +478,37 @@ export class OpenSearchResponse {
               // Remap level field based on the datasource config. This field is then used in explore to figure out the
               // log level. We may rewrite some actual data in the level field if they are different.
               doc['level'] = doc[logLevelField];
+            }
+
+            // When highlighting exists, we need to collect all the highlighted
+            // phrases and add them to the DataFrame's meta.searchWords array.
+            if (doc.highlight) {
+              // There might be multiple words so we need two versions of the
+              // regular expression. One to match globally, when used with part.match,
+              // it returns and array of matches. The second one is used to capture the
+              // values between the tags.
+              const globalHighlightWordRegex = new RegExp(HIGHLIGHT_TAGS_EXP, 'g');
+              const highlightWordRegex = new RegExp(HIGHLIGHT_TAGS_EXP);
+              const newSearchWords = Object.keys(doc.highlight)
+                .flatMap((key) => {
+                  return doc.highlight[key].flatMap((line: string) => {
+                    const matchedPhrases = line.match(globalHighlightWordRegex);
+                    if (!matchedPhrases) {
+                      return [];
+                    }
+                    return matchedPhrases.map((part) => {
+                      const matches = part.match(highlightWordRegex);
+                      return (matches && matches[1]) || null;
+                    });
+                  });
+                })
+                .filter(_.identity);
+              // If meta and searchWords already exists, add the words and
+              // deduplicate otherwise create a new set of search words.
+              const searchWords = series.meta?.searchWords
+                ? _.uniq([...series.meta.searchWords, ...newSearchWords])
+                : [...newSearchWords];
+              series.meta = series.meta ? { ...series.meta, searchWords } : { searchWords };
             }
 
             series.add(doc);
@@ -655,6 +689,7 @@ type Doc = {
   _type: string;
   _index: string;
   _source?: any;
+  highlight?: Record<string, string[]>;
 };
 
 /**
@@ -675,6 +710,7 @@ const flattenHits = (hits: Doc[]): { docs: Array<Record<string, any>>; propNames
       _id: hit._id,
       _type: hit._type,
       _index: hit._index,
+      highlight: hit.highlight,
       _source: { ...flattened },
       ...flattened,
     };

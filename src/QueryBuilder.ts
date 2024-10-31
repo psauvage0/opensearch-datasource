@@ -12,7 +12,7 @@ import {
   isPipelineAggregation,
   isPipelineAggregationWithMultipleBucketPaths,
 } from './components/QueryEditor/MetricAggregationsEditor/aggregations';
-import { defaultBucketAgg, defaultMetricAgg, defaultPPLFormat, findMetricById } from './query_def';
+import { defaultBucketAgg, defaultMetricAgg, defaultPPLFormat, findMetricById, highlightTags } from './query_def';
 import { Flavor, OpenSearchQuery, QueryType } from './types';
 
 export class QueryBuilder {
@@ -448,6 +448,14 @@ export class QueryBuilder {
     return {
       ...query,
       aggs: this.build(target, null, querystring).aggs,
+      highlight: {
+        fields: {
+          '*': {},
+        },
+        pre_tags: [highlightTags.pre],
+        post_tags: [highlightTags.post],
+        fragment_size: 2147483647,
+      },
     };
   }
 
@@ -459,9 +467,7 @@ export class QueryBuilder {
 
     for (i = 0; i < adhocFilters.length; i++) {
       if (dateMath.isValid(adhocFilters[i].value)) {
-        const validTime = dateTime(adhocFilters[i].value)
-          .utc()
-          .format('YYYY-MM-DD HH:mm:ss.SSSSSS');
+        const validTime = dateTime(adhocFilters[i].value).utc().format('YYYY-MM-DD HH:mm:ss.SSSSSS');
         value = `timestamp('${validTime}')`;
       } else if (typeof adhocFilters[i].value === 'string') {
         value = `'${adhocFilters[i].value}'`;
