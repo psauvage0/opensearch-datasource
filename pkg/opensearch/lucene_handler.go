@@ -11,10 +11,15 @@ import (
 
 	"github.com/bitly/go-simplejson"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/grafana/opensearch-datasource/pkg/opensearch/client"
 	"github.com/grafana/opensearch-datasource/pkg/tsdb"
 	"github.com/grafana/opensearch-datasource/pkg/utils"
+)
+
+var (
+	luceneLog = log.New()
 )
 
 type luceneHandler struct {
@@ -116,6 +121,7 @@ func getTraceId(rawQuery string) string {
 }
 
 func processLogsQuery(q *Query, b *client.SearchRequestBuilder, from, to int64, defaultTimeField string) {
+	luceneLog.Debug("query_from_grafana", fmt.Sprintf("%#v\n", q))
 	metric := q.Metrics[0]
 	b.Sort(descending, defaultTimeField, "boolean")
 	b.SetCustomProps(defaultTimeField, "logs")
