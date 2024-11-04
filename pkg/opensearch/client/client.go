@@ -18,7 +18,6 @@ import (
 
 	"github.com/Masterminds/semver"
 	// cspell:disable-next-line
-	"github.com/tidwall/pretty"
 
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/grafana/grafana-aws-sdk/pkg/sigv4"
@@ -276,7 +275,7 @@ func (c *baseClientImpl) executeRequest(ctx context.Context, method, uriPath, ur
 	}
 
 	clientLog.Debug("Executing request", "url", req.URL.String(), "method", method)
-	clientLog.Debug("body request", "body", pretty.Pretty(body))
+	clientLog.Debug("body request", "body", string(body))
 
 	var reqInfo *SearchRequestInfo
 	if c.debugEnabled {
