@@ -6,7 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/grafana/grafana-aws-sdk/pkg/awsds"
 	"io"
 	"net/http"
 	"net/url"
@@ -15,10 +14,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grafana/grafana-aws-sdk/pkg/sigv4"
+	"github.com/grafana/grafana-aws-sdk/pkg/awsds"
 
 	"github.com/Masterminds/semver"
+	// cspell:disable-next-line
+	"github.com/tidwall/pretty"
+
 	simplejson "github.com/bitly/go-simplejson"
+	"github.com/grafana/grafana-aws-sdk/pkg/sigv4"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
@@ -273,6 +276,7 @@ func (c *baseClientImpl) executeRequest(ctx context.Context, method, uriPath, ur
 	}
 
 	clientLog.Debug("Executing request", "url", req.URL.String(), "method", method)
+	clientLog.Debug("body request", "body", pretty.Pretty(body))
 
 	var reqInfo *SearchRequestInfo
 	if c.debugEnabled {
