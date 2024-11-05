@@ -2,6 +2,7 @@ package opensearch
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 
 	"github.com/bitly/go-simplejson"
@@ -73,7 +74,8 @@ func parse(reqQueries []backend.DataQuery) ([]*Query, error) {
 		model, _ := simplejson.NewJson(q.JSON)
 
 		strJson, _ := model.EncodePretty()
-		luceneLog.Debug("raw_json", strJson)
+		decode, _ := base64.RawStdEncoding.DecodeString(string(strJson))
+		luceneLog.Debug("raw_json", decode)
 
 		// we had a string-field named `timeField` in the past. we do not use it anymore.
 		// please do not create a new field with that name, to avoid potential problems with old, persisted queries.

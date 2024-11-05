@@ -911,6 +911,7 @@ export class OpenSearchDatasource
       // Setting this for metrics queries that are typed as logs
       target.isLogsQuery = true;
       queryObj = this.queryBuilder.getLogsQuery(target, adhocFilters, queryString);
+      console.log(queryObj);
     } else {
       if (target.alias) {
         target.alias = getTemplateSrv().replace(target.alias, options.scopedVars, 'lucene');
