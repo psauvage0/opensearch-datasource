@@ -122,7 +122,7 @@ func getTraceId(rawQuery string) string {
 
 func processLogsQuery(q *Query, b *client.SearchRequestBuilder, from, to int64, defaultTimeField string) {
 	metric := q.Metrics[0]
-	luceneLog.Debug("query_from_grafana", fmt.Sprintf("%#v\n", metric))
+	luceneLog.Debug("query_from_grafana", fmt.Sprintf("%#v\n", metric.Meta))
 	b.Sort(descending, defaultTimeField, "boolean")
 	b.SetCustomProps(defaultTimeField, "logs")
 

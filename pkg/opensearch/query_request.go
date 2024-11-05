@@ -71,6 +71,10 @@ func parse(reqQueries []backend.DataQuery) ([]*Query, error) {
 	queries := make([]*Query, 0)
 	for _, q := range reqQueries {
 		model, _ := simplejson.NewJson(q.JSON)
+
+		strJson, _ := model.EncodePretty()
+		luceneLog.Debug("raw_json", strJson)
+
 		// we had a string-field named `timeField` in the past. we do not use it anymore.
 		// please do not create a new field with that name, to avoid potential problems with old, persisted queries.
 		rawQuery := model.Get("query").MustString()
