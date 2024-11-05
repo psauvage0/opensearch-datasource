@@ -125,6 +125,7 @@ func processLogsQuery(q *Query, b *client.SearchRequestBuilder, from, to int64, 
 	luceneLog.Debug("query_from_grafana", fmt.Sprintf("%#v\n", metric.Meta))
 	b.Sort(descending, defaultTimeField, "boolean")
 	b.SetCustomProps(defaultTimeField, "logs")
+	b.AddHighlight()
 
 	sizeString := metric.Settings.Get("size").MustString()
 	size, err := strconv.Atoi(sizeString)

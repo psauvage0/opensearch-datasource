@@ -10,6 +10,12 @@ import (
 // nodeGraphSize is used for setting node graph query sizes. Arbitrarily chosen.
 const nodeGraphSize = 1000
 
+const (
+	HighlightPreTagsString  = "@HIGHLIGHT@"
+	HighlightPostTagsString = "@/HIGHLIGHT@"
+	HighlightFragmentSize   = 2147483647
+)
+
 // SearchRequestBuilder represents a builder which can build a search request
 type SearchRequestBuilder struct {
 	flavor       Flavor
@@ -128,6 +134,19 @@ func (b *SearchRequestBuilder) SetCustomProps(timeField string, luceneQueryType 
 		}
 	}
 	b.customProps[key] = value
+}
+
+// Add highlights to the search request for log queries
+func (b *SearchRequestBuilder) AddHighlight() *SearchRequestBuilder {
+	b.customProps["highlight"] = map[string]interface{}{
+		"fields": map[string]interface{}{
+			"*": map[string]interface{}{},
+		},
+		"pre_tags":      []string{HighlightPreTagsString},
+		"post_tags":     []string{HighlightPostTagsString},
+		"fragment_size": HighlightFragmentSize,
+	}
+	return b
 }
 
 // Query creates and return a query builder

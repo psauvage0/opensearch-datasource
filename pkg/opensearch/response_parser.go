@@ -43,6 +43,8 @@ const (
 	maxFlattenDepth = 10
 )
 
+var searchWordsRegex = regexp.MustCompile(regexp.QuoteMeta(client.HighlightPreTagsString) + `(.*?)` + regexp.QuoteMeta(client.HighlightPostTagsString))
+
 type KeyValue struct {
 	Key   string `json:"key"`
 	Value any    `json:"value"`
@@ -479,6 +481,7 @@ func processTraceListResponse(res *client.SearchResponse, dsUID string, dsName s
 func processLogsResponse(res *client.SearchResponse, configuredFields client.ConfiguredFields, queryRes backend.DataResponse) backend.DataResponse {
 	propNames := make(map[string]bool)
 	docs := make([]map[string]interface{}, len(res.Hits.Hits))
+	searchWords := make(map[string]bool)
 
 	for hitIdx, hit := range res.Hits.Hits {
 		var flattened map[string]interface{}
@@ -518,6 +521,22 @@ func processLogsResponse(res *client.SearchResponse, configuredFields client.Con
 			propNames[key] = true
 		}
 
+		// Process highlight to searchWords
+		if highlights, ok := doc["highlight"].(map[string]interface{}); ok {
+			for _, highlight := range highlights {
+				if highlightList, ok := highlight.([]interface{}); ok {
+					for _, highlightValue := range highlightList {
+						str := fmt.Sprintf("%v", highlightValue)
+						matches := searchWordsRegex.FindAllStringSubmatch(str, -1)
+
+						for _, v := range matches {
+							searchWords[v[1]] = true
+						}
+					}
+				}
+			}
+		}
+
 		docs[hitIdx] = doc
 	}
 
@@ -529,6 +548,7 @@ func processLogsResponse(res *client.SearchResponse, configuredFields client.Con
 		frame.Meta = &data.FrameMeta{}
 	}
 	frame.Meta.PreferredVisualization = data.VisTypeLogs
+	setSearchWords(frame, searchWords)
 
 	queryRes.Frames = append(queryRes.Frames, data.Frames{frame}...)
 	return queryRes
@@ -1166,6 +1186,28 @@ func extractDataField[KeyType *string | *float64](name string, key KeyType) *dat
 	field.Config = &data.FieldConfig{Filterable: &isFilterable}
 	field.Append(key)
 	return field
+}
+
+func setSearchWords(frame *data.Frame, searchWords map[string]bool) {
+	i := 0
+	searchWordsList := make([]string, len(searchWords))
+	for searchWord := range searchWords {
+		searchWordsList[i] = searchWord
+		i++
+	}
+	sort.Strings(searchWordsList)
+
+	if frame.Meta == nil {
+		frame.Meta = &data.FrameMeta{}
+	}
+
+	if frame.Meta.Custom == nil {
+		frame.Meta.Custom = map[string]interface{}{}
+	}
+
+	frame.Meta.Custom = map[string]interface{}{
+		"searchWords": searchWordsList,
+	}
 }
 
 func (rp *responseParser) trimDatapoints(frames *data.Frames, target *Query) {
