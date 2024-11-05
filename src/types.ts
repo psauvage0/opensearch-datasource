@@ -1,4 +1,5 @@
-import { DataFrame, DataQuery, DataQueryResponse, DataSourceJsonData } from '@grafana/data';
+import { DataFrame, DataQueryResponse, DataSourceJsonData } from '@grafana/data';
+import * as common from '@grafana/schema';
 import {
   BucketAggregation,
   BucketAggregationType,
@@ -70,7 +71,7 @@ export type FormatConfiguration = {
 
 export type Aggregation = MetricAggregation | BucketAggregation;
 
-export interface OpenSearchQuery extends DataQuery {
+export interface OpenSearchQuery extends common.DataQuery {
   isLogsQuery?: boolean;
   alias?: string;
   query?: string;
