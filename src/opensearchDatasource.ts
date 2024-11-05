@@ -456,7 +456,7 @@ export class OpenSearchDatasource
       for (let i = 0; i < fieldNames.length; i++) {
         fieldValue = fieldValue[fieldNames[i]];
         if (!fieldValue) {
-          console.log('could not find field in annotation: ', fieldName);
+          console.error('could not find field in annotation: ', fieldName);
           return '';
         }
       }
@@ -900,7 +900,7 @@ export class OpenSearchDatasource
     // @ts-ignore
     // add global adhoc filters to timeFilter
     const adhocFilters = getTemplateSrv().getAdhocFilters(this.name);
-    console.log('createLuceneQuery');
+    console.error('createLuceneQuery');
 
     let queryObj;
     if (target.luceneQueryType === LuceneQueryType.Traces) {
@@ -912,7 +912,7 @@ export class OpenSearchDatasource
       // Setting this for metrics queries that are typed as logs
       target.isLogsQuery = true;
       queryObj = this.queryBuilder.getLogsQuery(target, adhocFilters, queryString);
-      console.log(queryObj);
+      console.error(queryObj);
     } else {
       if (target.alias) {
         target.alias = getTemplateSrv().replace(target.alias, options.scopedVars, 'lucene');
@@ -926,7 +926,7 @@ export class OpenSearchDatasource
         ? 'count'
         : 'query_then_fetch';
     const header = this.getQueryHeader(searchType, options.range.from, options.range.to);
-    console.log('esQuery', esQuery);
+    console.error('esQuery', esQuery);
     return header + '\n' + esQuery + '\n';
   }
 
