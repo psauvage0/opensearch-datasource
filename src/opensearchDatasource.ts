@@ -900,6 +900,7 @@ export class OpenSearchDatasource
     // @ts-ignore
     // add global adhoc filters to timeFilter
     const adhocFilters = getTemplateSrv().getAdhocFilters(this.name);
+    console.log('createLuceneQuery');
 
     let queryObj;
     if (target.luceneQueryType === LuceneQueryType.Traces) {
@@ -925,6 +926,7 @@ export class OpenSearchDatasource
         ? 'count'
         : 'query_then_fetch';
     const header = this.getQueryHeader(searchType, options.range.from, options.range.to);
+    console.log('esQuery', esQuery);
     return header + '\n' + esQuery + '\n';
   }
 
