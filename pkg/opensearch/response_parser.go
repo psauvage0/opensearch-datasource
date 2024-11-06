@@ -527,8 +527,8 @@ func processLogsResponse(res *client.SearchResponse, configuredFields client.Con
 		}
 
 		// Process highlight to searchWords
+		clientLog.Debug("doc", fmt.Sprintf("%+v", doc))
 		if highlights, ok := doc["highlight"].(map[string]interface{}); ok {
-			clientLog.Debug("doc", fmt.Sprintf("%+v", doc["highlight"].(map[string]interface{})))
 			for _, highlight := range highlights {
 				if highlightList, ok := highlight.([]interface{}); ok {
 					for _, highlightValue := range highlightList {
