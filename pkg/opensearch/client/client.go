@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -392,11 +393,11 @@ func (c *baseClientImpl) ExecuteMultisearch(ctx context.Context, r *MultiSearchR
 			},
 		}
 
-		resp := msr.DebugInfo.Request.Data
-		req, _ := msr.DebugInfo.Response.Data.EncodePretty()
-
-		clientLog.Debug("resp", resp)
+		req := msr.DebugInfo.Request.Data
+		resp, _ := msr.DebugInfo.Response.Data.EncodePretty()
+		decode, _ := base64.RawStdEncoding.DecodeString(string(resp))
 		clientLog.Debug("req", req)
+		clientLog.Debug("resp", string(decode))
 	}
 
 	return &msr, nil
