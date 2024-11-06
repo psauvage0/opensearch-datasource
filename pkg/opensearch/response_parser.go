@@ -495,10 +495,11 @@ func processLogsResponse(res *client.SearchResponse, configuredFields client.Con
 		}
 
 		doc := map[string]interface{}{
-			"_id":     hit["_id"],
-			"_type":   hit["_type"],
-			"_index":  hit["_index"],
-			"_source": flattened,
+			"_id":       hit["_id"],
+			"_type":     hit["_type"],
+			"_index":    hit["_index"],
+			"_source":   flattened,
+			"highlight": hit["highlight"],
 		}
 
 		for k, v := range flattened {
