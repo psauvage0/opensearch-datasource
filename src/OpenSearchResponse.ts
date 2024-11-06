@@ -11,8 +11,6 @@ import {
 import { createEmptyDataFrame, describeMetric } from './utils';
 import { metricAggregationConfig } from './components/QueryEditor/MetricAggregationsEditor/utils';
 
-const HIGHLIGHT_TAGS_EXP = `${queryDef.highlightTags.pre}([^@]+)${queryDef.highlightTags.post}`;
-
 export class OpenSearchResponse {
   constructor(
     private targets: OpenSearchQuery[],

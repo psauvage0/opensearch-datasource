@@ -361,6 +361,7 @@ func (c *baseClientImpl) ExecuteMultisearch(ctx context.Context, r *MultiSearchR
 			res.Body = io.NopCloser(bytes.NewBuffer(tmpBytes))
 		}
 	}
+	clientLog.Debug(fmt.Sprintf("RESP = %s", string(bodyBytes)))
 
 	var msr MultiSearchResponse
 	dec := json.NewDecoder(res.Body)
