@@ -12,10 +12,15 @@ import (
 
 	simplejson "github.com/bitly/go-simplejson"
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
+	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/experimental/errorsource"
 	"github.com/grafana/opensearch-datasource/pkg/opensearch/client"
 	utils "github.com/grafana/opensearch-datasource/pkg/utils"
+)
+
+var (
+	clientLog = log.New()
 )
 
 const (
@@ -522,6 +527,7 @@ func processLogsResponse(res *client.SearchResponse, configuredFields client.Con
 		}
 
 		// Process highlight to searchWords
+		clientLog.Debug("doc", fmt.Sprintf("%+v", doc["highlight"].(map[string]interface{})))
 		if highlights, ok := doc["highlight"].(map[string]interface{}); ok {
 			for _, highlight := range highlights {
 				if highlightList, ok := highlight.([]interface{}); ok {

@@ -392,13 +392,13 @@ func (c *baseClientImpl) ExecuteMultisearch(ctx context.Context, r *MultiSearchR
 			},
 		}
 
-		req := msr.DebugInfo.Request.Data
-		clientLog.Debug("req", req)
+		// req := msr.DebugInfo.Request.Data
+		// clientLog.Debug("req", req)
 
-		for _, resp := range msr.Responses {
-			clientLog.Debug("HITS", fmt.Sprintf("%+v", resp.Hits.Hits))
+		// for _, resp := range msr.Responses {
+		// 	clientLog.Debug("HITS", fmt.Sprintf("%+v", resp.Hits.Hits))
 
-		}
+		// }
 
 	}
 
