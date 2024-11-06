@@ -142,8 +142,6 @@ func (b *SearchRequestBuilder) AddHighlight() *SearchRequestBuilder {
 		"fields": map[string]interface{}{
 			"*": map[string]interface{}{},
 		},
-		"pre_tags":      []string{HighlightPreTagsString},
-		"post_tags":     []string{HighlightPostTagsString},
 		"fragment_size": HighlightFragmentSize,
 	}
 	return b
